@@ -1,0 +1,12 @@
+seedfunction:
+  handler: src/handlers/seed.seed
+  events:
+    - httpApi:
+        path: /seed
+        method: POST          
+uploadFile:
+  handler: src/handlers/seed.uploadFile
+  events:
+    - httpApi:
+        path: /upload/testFile
+        method: POST

@@ -1,0 +1,24 @@
+createTransfer:
+  handler: src/handlers/transfers.createTransfer
+  events:
+    - httpApi:
+        path: /transfers/create
+        method: POST
+getAllTransfer:
+  handler: src/handlers/transfers.getAllTransfers
+  events:
+    - httpApi:
+        path: /transfers/getAll
+        method: GET
+updateTransfer:
+  handler: src/handlers/transfers.updateTransfer
+  events:
+    - httpApi:
+        path: /transfers/update/{id}
+        method: PATCH
+deleteTransfer:
+  handler: src/handlers/transfers.deleteTransfer
+  events:
+    - httpApi:
+        path: /transfers/delete/{id}
+        method: DELETE

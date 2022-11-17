@@ -1,0 +1,6 @@
+pruebasSls:
+  handler: src/handlers/pruebas.pruebas
+  events:
+    - httpApi: 
+        path: /api/slspruebas
+        method: GET
