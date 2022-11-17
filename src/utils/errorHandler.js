@@ -35,6 +35,13 @@ const Responses = {
             statusCode: HttpStatusCode.NOT_FOUND,
             body: JSON.stringify( data )
         }
+    },
+    _500( data = {} ){
+        return{
+            headers,
+            statusCode: HttpStatusCode.NOT_FOUND,
+            body: JSON.stringify( data )
+        }
     }
 }
 

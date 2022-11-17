@@ -5,9 +5,8 @@ const uuid   = require( 'uuid' )
 require( 'dotenv' ).config()
 // Utils
 const { validatetKeys } = require("../utils/validateKeys.util")
-const { ApiError, errorHandler } = require("../utils/errorHandler")
-const { HttpStatusCode } = require("../utils/httpStatusCode")
 const { fetchTransfersID } = require("../utils/fetchTransfersID")
+const Responses = require("../utils/errorHandler")
 // Variables
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 
@@ -34,10 +33,7 @@ const createTransfer = async( event ) => {
         // Validación nwTransfer cumple con las llaves permitidas
         const isCorrectKeys = validatetKeys( nwTransfer )
         if( !isCorrectKeys ){
-            throw new ApiError( 
-                'Asegurate que la claves(keys) sean correctas',
-                HttpStatusCode.BAD_REQUEST
-            )
+            return Responses._400({ ok: false, msg: 'Revisa que la claves(keys) sean correctas' })
         }
                 
         await dynamoDB.put({
@@ -52,13 +48,14 @@ const createTransfer = async( event ) => {
         }
 
     }catch( e ){
-        errorHandler( e )
+        return Responses._500( e )
     }
 }
 
 // GET ALL TRANSFERS - GET
 const getAllTransfers = async( event ) => {
 
+    // TODO: cambiar a querys
     const res = await dynamoDB.scan({
         TableName: process.env.TABLE_NAME
     }).promise()
@@ -78,15 +75,14 @@ const updateTransfer = async( event ) => {
     const { id } = event.pathParameters
     const { comment, monto, ...props } = JSON.parse( event.body )
     const updatedAt = moment().toISOString()
-    let response = {}
 
     const res  = await fetchTransfersID( id )
     const data = res.Item
 
-    if( !data ) response = { 
-        statusCode: 404, 
-        msg: `Transfers with id: ${ id } does not exist` 
-    }
+    if( !data ) return Responses._404({ 
+        ok: false, 
+        msg: `Transfer with id: ${id} does not exist` 
+    })
 
     await dynamoDB.update({
         TableName: process.env.TABLE_NAME,
@@ -105,12 +101,10 @@ const updateTransfer = async( event ) => {
         ReturnValues: 'ALL_NEW'
     }).promise()
 
-    response = { 
-        ok: true,
-        msg: 'Successful info update' 
-    }
-
-    return response
+    return Responses._200({ 
+        ok: true, msg: 
+        'Successful info update' 
+    })
 } 
 
 // DELETE TRANSFER - DELETE
@@ -121,12 +115,12 @@ const deleteTransfer = async( event ) => {
 
     const res  = await fetchTransfersID( id )
     const data = res.Item
-    let response = {}
 
-    if( !data ) response = { 
-        statusCode: 404, 
-        msg: `Transfers with id: ${ id } does not exist` 
-    }
+
+    if( !data ) Responses._404({ 
+        ok: false, 
+        msg: `Transfer with id: ${id} does not exist` 
+    })
 
     await dynamoDB.update({
         TableName: process.env.TABLE_NAME,
@@ -143,11 +137,11 @@ const deleteTransfer = async( event ) => {
         ReturnValues: 'ALL_NEW'
     }).promise()
 
-    response = {
-        ok: true,
-        msg: 'Successful transfer'
-    }
-    return response
+    
+    return Responses._200({ 
+        ok: true, 
+        msg: 'Successful transfer' 
+    })
 } 
 
 
